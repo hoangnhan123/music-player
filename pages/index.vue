@@ -52,7 +52,7 @@
         <div class="playlist" @click="playCurrentSong">
           <div v-for="(song, index) in songInfos">
             <div class="song" :data-index="index">
-                <img class="thumb" :src="require('@/assets/img/' + song.image)"/>
+                <img class="thumb" :src="song.image"/>
                 <div class="body">
                     <h3 class="title">{{song.name}}</h3>
                     <p class="author">{{song.singer}}</p>
@@ -90,6 +90,7 @@ export default {
           if (songNode) {
               this.currentIndex = Number(songNode.dataset.index);
               this.loadcurrentSongInfo();
+              
               this.$refs.audio.src = this.currentSongInfo.path.default;
               this.$refs.audio.play();
           }
@@ -104,7 +105,7 @@ export default {
     loadcurrentSongInfo () {
       this.currentSongInfo = this.songInfos[this.currentIndex];
       this.$refs.songName.textContent = this.currentSongInfo.name;
-      this.$refs.cdThumb.style.backgroundImage = 'url(' + require('@/assets/img/' + this.currentSongInfo.image) + ')';
+      this.$refs.cdThumb.style.backgroundImage = 'url(' + this.currentSongInfo.image + ')';
     }
   },
   computed: {
