@@ -79,8 +79,7 @@ export default {
       currentIndex: 0,
       currentSongInfo : '',
       status: 'Now Playing',
-      songName: 'String 57th & 9th',
-      player: new Audio()
+      songName: 'String 57th & 9th'
     }
   },
   methods: {
@@ -91,7 +90,8 @@ export default {
           if (songNode) {
               this.currentIndex = Number(songNode.dataset.index);
               this.loadcurrentSongInfo();
-              this.player.src = '@/assets/music/Ghe Qua - Dick x PC x Tofu.mp3';
+              this.$refs.audio.src = this.currentSongInfo.path.default;
+              this.$refs.audio.play();
           }
           if (songOption) {
               //.........
@@ -108,11 +108,6 @@ export default {
     }
   },
   computed: {
-    loadListSongs() {
-
-    }
-  },
-  created () {
   },
   mounted() {
     this.loadcurrentSongInfo();
