@@ -8,7 +8,7 @@
       <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     </head>
     <body>
-      <div class="player">
+      <div class="player" ref="player">
         <!-- Dashboard -->
         <div class="dashboard">
           <!-- Header -->
@@ -28,14 +28,14 @@
             <div class="btn btn-repeat">
               <i class="fas fa-redo"></i>
             </div>
-            <div class="btn btn-prev">
+            <div class="btn btn-prev" @click="prevSong">
               <i class="fas fa-step-backward"></i>
             </div>
-            <div class="btn btn-toggle-play">
+            <div class="btn btn-toggle-play" @click="onPlay">
               <i class="fas fa-pause icon-pause"></i>
               <i class="fas fa-play icon-play"></i>
             </div>
-            <div class="btn btn-next">
+            <div class="btn btn-next" ref="btnNext" @click="nextSong">
               <i class="fas fa-step-forward"></i>
             </div>
             <div class="btn btn-random">
@@ -43,7 +43,7 @@
             </div>
           </div>
       
-          <input id="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
+          <input id="progress" ref="progress" class="progress" type="range" value="0" step="1" min="0" max="100">
       
           <audio id="audio" src="" ref="audio"></audio>
         </div>
@@ -75,14 +75,26 @@ export default {
   name: 'MusicApp',
   data() {
     return {
+      // get list song
       songInfos: songInfos,
+      // current song
       currentIndex: 0,
       currentSongInfo : '',
+      // cd animation
+      cdThumdAnimate: '',
+      // Có hay không đang phát nhạc ???
+      isPlaying: false,
+      // Có hay không đang repeat bài hát ???
+      isRepeat: false,
+      // Có hay không đang ngẫu nhiên bài hát ???
+      isRandom: false,
+      // others
       status: 'Now Playing',
       songName: 'String 57th & 9th'
     }
   },
   methods: {
+    //Xử lý phát nhạc khi bấm
     playCurrentSong (e) {
       const songNode = e.target.closest('.song:not(.active)');
       const songOption = e.target.closest('.option');
@@ -90,9 +102,10 @@ export default {
           if (songNode) {
               this.currentIndex = Number(songNode.dataset.index);
               this.loadcurrentSongInfo();
-              
               this.$refs.audio.src = this.currentSongInfo.path.default;
-              this.$refs.audio.play();
+              if (this.isPlaying) {
+                this.$refs.audio.play();
+              }
           }
           if (songOption) {
               //.........
@@ -102,16 +115,114 @@ export default {
           // do nothing
       }
     },
+    //Xử lý bấm Play phát nhạc
+    onPlay() {
+      if (this.isPlaying) {
+          this.$refs.audio.pause();
+      } else {
+          this.$refs.audio.play();
+      };
+
+      this.$refs.audio.onplay = () => {
+          this.isPlaying = true;
+          this.$refs.player.classList.add('playing');
+          this.cdThumdAnimate.play();
+      };
+
+      this.$refs.audio.onpause = () => {
+          this.isPlaying = false;
+          this.$refs.player.classList.remove('playing');
+          this.cdThumdAnimate.pause();
+      };
+
+      this.$refs.audio.ontimeupdate = () => {
+          if (this.$refs.audio.duration) {
+              const progressPercent = Math.floor(this.$refs.audio.currentTime / this.$refs.audio.duration*100);
+              this.$refs.progress.value = progressPercent;
+          }
+      };
+
+      //Xử lý khi tua
+      this.$refs.progress.onchange = (e) => {
+          const seekTime = this.$refs.audio.duration / 100 * e.target.value;
+          this.$refs.audio.currentTime = seekTime;
+      };
+
+      //Xử lý khi kết thúc bài hát
+      this.$refs.audio.onended = () => {
+          if (this.isRepeat) {
+              this.$refs.audio.play();
+          } else {
+              if (!(this.currentIndex == this.songInfos.length - 1)) {
+                  this.isPlaying = true;
+              }
+              this.$refs.progress.value = 0;
+              this.$refs.btnNext.click();
+          }
+      }
+    },
+
+    nextSong() {
+      if (this.isRandom) {
+        this.playRandomSong();
+      } else {
+        this.currentIndex++;
+        if (this.currentIndex >= this.songInfos.length) {
+            this.currentIndex = 0;
+        }
+        this.loadcurrentSongInfo();
+      }
+      if (this.isPlaying) {
+        this.$refs.audio.play();
+      }
+    },
+    
+    prevSong() {
+      if (this.isRandom) {
+          this.playRandomSong();
+      } else {
+        this.currentIndex--;
+        if (this.currentIndex < 0) {
+            this.currentIndex = this.songInfos.length - 1;
+        }
+        this.loadcurrentSongInfo();
+      }
+      if (this.isPlaying) {
+        this.$refs.audio.play();
+      }
+    },
+
+    playRandomSong() {
+      let newIndex;
+      do {
+          newIndex = Math.floor(Math.random() * this.songInfos.length);
+      } while (newIndex === this.currentIndex);
+      this.currentIndex = newIndex;
+      this.loadcurrentSongInfo();
+    },
+
+    //Xử lý lưu thông tin bài hát hiện tại
     loadcurrentSongInfo () {
       this.currentSongInfo = this.songInfos[this.currentIndex];
       this.$refs.songName.textContent = this.currentSongInfo.name;
       this.$refs.cdThumb.style.backgroundImage = 'url(' + this.currentSongInfo.image + ')';
-    }
+      this.$refs.audio.src = this.currentSongInfo.path.default;
+    },
   },
   computed: {
   },
   mounted() {
     this.loadcurrentSongInfo();
+
+    // Xử lý CD/ Quay dừng
+    this.cdThumdAnimate = this.$refs.cdThumb.animate([
+            { transform: 'rotate(360deg)' }
+        ], {
+            duration: 10000,
+            iterations: Infinity
+    });
+    this.cdThumdAnimate.pause();
+
   }
 }
 </script>
