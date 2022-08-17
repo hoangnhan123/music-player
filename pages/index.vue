@@ -14,18 +14,18 @@
           <!-- Header -->
           <header>
             <h4>Now playing:</h4>
-            <h2 ref="songName">String 57th & 9th</h2>
+            <h2 ref="songName"></h2>
           </header>
       
           <!-- CD -->
-          <div class="cd">
-            <div class="cd-thumb" ref="cdThumb" style="background-image: url('https://i.ytimg.com/vi/jTLhQf5KJSc/maxresdefault.jpg')">
+          <div class="cd" ref="cd">
+            <div class="cd-thumb" ref="cdThumb">
             </div>
           </div>
       
           <!-- Control -->
           <div class="control">
-            <div class="btn btn-repeat">
+            <div class="btn btn-repeat" ref="btnRepeat" @click="repeatSong">
               <i class="fas fa-redo"></i>
             </div>
             <div class="btn btn-prev" @click="prevSong">
@@ -38,7 +38,7 @@
             <div class="btn btn-next" ref="btnNext" @click="nextSong">
               <i class="fas fa-step-forward"></i>
             </div>
-            <div class="btn btn-random">
+            <div class="btn btn-random" ref="btnRandom" @click="randomSong">
               <i class="fas fa-random"></i>
             </div>
           </div>
@@ -49,9 +49,9 @@
         </div>
       
         <!-- Playlist -->
-        <div class="playlist" @click="playCurrentSong">
+        <div class="playlist">
           <div v-for="(song, index) in songInfos">
-            <div class="song" :data-index="index">
+            <div class="song" ref="song" :data-index="index" @click="playCurrentSong">
                 <img class="thumb" :src="song.image"/>
                 <div class="body">
                     <h3 class="title">{{song.name}}</h3>
@@ -80,6 +80,7 @@ export default {
       // current song
       currentIndex: 0,
       currentSongInfo : '',
+      currentSongNode: '',
       // cd animation
       cdThumdAnimate: '',
       // Có hay không đang phát nhạc ???
@@ -96,11 +97,11 @@ export default {
   methods: {
     //Xử lý phát nhạc khi bấm
     playCurrentSong (e) {
-      const songNode = e.target.closest('.song:not(.active)');
+      this.currentSongNode = e.target.closest('.song:not(.active)');
       const songOption = e.target.closest('.option');
-      if (songNode || songOption) {
-          if (songNode) {
-              this.currentIndex = Number(songNode.dataset.index);
+      if (this.currentSongNode || songOption) {
+          if (this.currentSongNode) {
+              this.currentIndex = Number(this.currentSongNode.dataset.index);
               this.loadcurrentSongInfo();
               this.$refs.audio.src = this.currentSongInfo.path.default;
               if (this.isPlaying) {
@@ -192,6 +193,11 @@ export default {
       }
     },
 
+    randomSong() {
+      this.isRandom = !this.isRandom;
+      this.$refs.btnRandom.classList.toggle('active');
+    },
+
     playRandomSong() {
       let newIndex;
       do {
@@ -201,12 +207,22 @@ export default {
       this.loadcurrentSongInfo();
     },
 
+    repeatSong() {
+      this.isRepeat = !this.isRepeat;
+      this.$refs.btnRepeat.classList.toggle('active');
+    },
+
     //Xử lý lưu thông tin bài hát hiện tại
     loadcurrentSongInfo () {
       this.currentSongInfo = this.songInfos[this.currentIndex];
       this.$refs.songName.textContent = this.currentSongInfo.name;
       this.$refs.cdThumb.style.backgroundImage = 'url(' + this.currentSongInfo.image + ')';
       this.$refs.audio.src = this.currentSongInfo.path.default;
+
+      for (let index = 0; index < this.$refs.song.length; index++) {
+        this.$refs.song[index].classList.remove('active');
+      }
+      this.$refs.song[this.currentIndex].classList.add('active');
     },
   },
   computed: {
@@ -223,6 +239,17 @@ export default {
     });
     this.cdThumdAnimate.pause();
 
+    // Xử lý phóng to // thu nhỏ
+    const cdWidth = this.$refs.cd.offsetWidth;
+    document.onscroll = () => {
+        let scrollTop = window.scrollY || window.scrollTop;
+        if (scrollTop == undefined) {
+          scrollTop = 0;
+        }
+        const newCdWidth = cdWidth - scrollTop;
+        this.$refs.cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 1;
+        this.$refs.cd.style.opacity = newCdWidth / cdWidth;
+    }
   }
 }
 </script>
