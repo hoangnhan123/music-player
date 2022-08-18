@@ -1,4 +1,4 @@
-# music-player
+# music player using NuxtJS Framework
 
 ## Build Setup
 
