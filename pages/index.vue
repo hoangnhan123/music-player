@@ -11,6 +11,7 @@
       <div class="player" ref="player">
         <!-- Dashboard -->
         <div class="dashboard">
+          
           <!-- Header -->
           <header>
             <h4>Now playing:</h4>
@@ -18,10 +19,7 @@
           </header>
       
           <!-- CD -->
-          <div class="cd" ref="cd">
-            <div class="cd-thumb" ref="cdThumb">
-            </div>
-          </div>
+          <CD :image="currentSongInfo.image" :isPlaying="isPlaying"/>
       
           <!-- Control -->
           <div class="control">
@@ -70,9 +68,15 @@
 
 <script>
 import songInfos from '@/assets/music/list-song.js';
+import CD from '@/components/CD.vue';
+import PlayList from '@/components/PlayList.vue';
 
 export default {
   name: 'MusicApp',
+  components: {
+    CD,
+    PlayList
+  },
   data() {
     return {
       // get list song
@@ -81,8 +85,6 @@ export default {
       currentIndex: 0,
       currentSongInfo : '',
       currentSongNode: '',
-      // cd animation
-      cdThumdAnimate: '',
       // Có hay không đang phát nhạc ???
       isPlaying: false,
       // Có hay không đang repeat bài hát ???
@@ -127,13 +129,11 @@ export default {
       this.$refs.audio.onplay = () => {
           this.isPlaying = true;
           this.$refs.player.classList.add('playing');
-          this.cdThumdAnimate.play();
       };
 
       this.$refs.audio.onpause = () => {
           this.isPlaying = false;
           this.$refs.player.classList.remove('playing');
-          this.cdThumdAnimate.pause();
       };
 
       this.$refs.audio.ontimeupdate = () => {
@@ -216,7 +216,6 @@ export default {
     loadcurrentSongInfo () {
       this.currentSongInfo = this.songInfos[this.currentIndex];
       this.$refs.songName.textContent = this.currentSongInfo.name;
-      this.$refs.cdThumb.style.backgroundImage = 'url(' + this.currentSongInfo.image + ')';
       this.$refs.audio.src = this.currentSongInfo.path.default;
 
       for (let index = 0; index < this.$refs.song.length; index++) {
@@ -229,27 +228,6 @@ export default {
   },
   mounted() {
     this.loadcurrentSongInfo();
-
-    // Xử lý CD/ Quay dừng
-    this.cdThumdAnimate = this.$refs.cdThumb.animate([
-            { transform: 'rotate(360deg)' }
-        ], {
-            duration: 10000,
-            iterations: Infinity
-    });
-    this.cdThumdAnimate.pause();
-
-    // Xử lý phóng to // thu nhỏ
-    const cdWidth = this.$refs.cd.offsetWidth;
-    document.onscroll = () => {
-        let scrollTop = window.scrollY || window.scrollTop;
-        if (scrollTop == undefined) {
-          scrollTop = 0;
-        }
-        const newCdWidth = cdWidth - scrollTop;
-        this.$refs.cd.style.width = newCdWidth > 0 ? newCdWidth + 'px' : 1;
-        this.$refs.cd.style.opacity = newCdWidth / cdWidth;
-    }
   }
 }
 </script>
