@@ -31,7 +31,7 @@ export default {
   computed: {
   },
   mounted() {
-    // Xử lý CD/ Quay dừng
+    // Handle Stop and Rotate of CD
     this.cdThumdAnimate = this.$refs.cdThumb.animate([
             { transform: 'rotate(360deg)' }
         ], {
@@ -40,7 +40,7 @@ export default {
     });
     this.cdThumdAnimate.pause();
 
-    // Xử lý phóng to // thu nhỏ
+    // Handle zoom in and zoom out CD when scroll screen
     const cdWidth = this.$refs.cd.offsetWidth;
     document.onscroll = () => {
         let scrollTop = window.scrollY || window.scrollTop;
@@ -56,7 +56,6 @@ export default {
 </script>
 
 <style scoped>
-/* CD */
 .cd {
     display: flex;
     margin: auto;

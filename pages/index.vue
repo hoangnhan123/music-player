@@ -69,35 +69,27 @@
 <script>
 import songInfos from '@/assets/music/list-song.js';
 import CD from '@/components/CD.vue';
-import PlayList from '@/components/PlayList.vue';
 
 export default {
   name: 'MusicApp',
   components: {
-    CD,
-    PlayList
+    CD
   },
   data() {
     return {
-      // get list song
       songInfos: songInfos,
-      // current song
       currentIndex: 0,
       currentSongInfo : '',
       currentSongNode: '',
-      // Có hay không đang phát nhạc ???
       isPlaying: false,
-      // Có hay không đang repeat bài hát ???
       isRepeat: false,
-      // Có hay không đang ngẫu nhiên bài hát ???
       isRandom: false,
-      // others
       status: 'Now Playing',
       songName: 'String 57th & 9th'
     }
   },
   methods: {
-    //Xử lý phát nhạc khi bấm
+    //Handle music playback when click
     playCurrentSong (e) {
       this.currentSongNode = e.target.closest('.song:not(.active)');
       const songOption = e.target.closest('.option');
@@ -113,12 +105,11 @@ export default {
           if (songOption) {
               //.........
           }
-          
       } else {
           // do nothing
       }
     },
-    //Xử lý bấm Play phát nhạc
+    //Handle music playback when pressing Play
     onPlay() {
       if (this.isPlaying) {
           this.$refs.audio.pause();
@@ -143,13 +134,13 @@ export default {
           }
       };
 
-      //Xử lý khi tua
+      //Handle progress
       this.$refs.progress.onchange = (e) => {
           const seekTime = this.$refs.audio.duration / 100 * e.target.value;
           this.$refs.audio.currentTime = seekTime;
       };
 
-      //Xử lý khi kết thúc bài hát
+      //Handle at the end of the song
       this.$refs.audio.onended = () => {
           if (this.isRepeat) {
               this.$refs.audio.play();
@@ -162,7 +153,7 @@ export default {
           }
       }
     },
-
+    //Handle when next song
     nextSong() {
       if (this.isRandom) {
         this.playRandomSong();
@@ -177,7 +168,7 @@ export default {
         this.$refs.audio.play();
       }
     },
-    
+    //Handle when prev song
     prevSong() {
       if (this.isRandom) {
           this.playRandomSong();
@@ -192,12 +183,11 @@ export default {
         this.$refs.audio.play();
       }
     },
-
+    //Handle when random song
     randomSong() {
       this.isRandom = !this.isRandom;
       this.$refs.btnRandom.classList.toggle('active');
     },
-
     playRandomSong() {
       let newIndex;
       do {
@@ -206,13 +196,13 @@ export default {
       this.currentIndex = newIndex;
       this.loadcurrentSongInfo();
     },
-
+    //Handle when repeat song
     repeatSong() {
       this.isRepeat = !this.isRepeat;
       this.$refs.btnRepeat.classList.toggle('active');
     },
 
-    //Xử lý lưu thông tin bài hát hiện tại
+    //Handle save current song information
     loadcurrentSongInfo () {
       this.currentSongInfo = this.songInfos[this.currentIndex];
       this.$refs.songName.textContent = this.currentSongInfo.name;
@@ -226,6 +216,7 @@ export default {
   },
   computed: {
   },
+  //Load top song when load first time.
   mounted() {
     this.loadcurrentSongInfo();
   }
