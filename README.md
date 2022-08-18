@@ -1,4 +1,4 @@
-# music-player-by-nuxt
+# music-player
 
 ## Build Setup
 
