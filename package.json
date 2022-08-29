@@ -6,7 +6,9 @@
     "dev": "nuxt",
     "build": "nuxt build",
     "start": "nuxt start",
-    "generate": "nuxt generate"
+    "generate": "nuxt generate",
+    "predeploy": "nuxt generate",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "core-js": "^3.19.3",
@@ -17,6 +19,7 @@
     "webpack": "^4.46.0"
   },
   "devDependencies": {
-    "@nuxt/image": "^0.7.1"
+    "@nuxt/image": "^0.7.1",
+    "gh-pages": "^4.0.0"
   }
 }
