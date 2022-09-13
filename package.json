@@ -8,7 +8,7 @@
     "start": "nuxt start",
     "generate": "nuxt generate",
     "predeploy": "nuxt generate",
-    "deploy": "gh-pages -d dist"
+    "deploy": "push-dir --dir=dist --branch=gh-pages --cleanup"
   },
   "dependencies": {
     "core-js": "^3.19.3",
@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@nuxt/image": "^0.7.1",
-    "gh-pages": "^4.0.0"
+    "gh-pages": "^4.0.0",
+    "push-dir": "^0.4.1"
   }
 }
